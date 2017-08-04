@@ -1,21 +1,40 @@
+<template lang="pug">
+  .index
+    pull-to-load
+      .index__content
+        .index__top
+          | I'm top
+        .index__bottom
+          | I'm bottom
+</template>
+
+
 <script>
-import pullToRefresh from '@/components/pull-to-refresh/pull-to-refresh'
+import pullToLoad from '@/components/pull-to-load/pull-to-load.vue'
 
 export default {
   components: {
-    pullToRefresh,
-  },
-  render() {
-    return (
-      <div class="index">
-        <pull-to-refresh>
-          index
-        </pull-to-refresh>
-      </div>
-    )
+    pullToLoad,
   },
 }
 </script>
 
-<style>
+<style lang="stylus">
+
+.index
+  position absolute
+  top 50px
+  left 0
+  bottom 50px
+  right 0
+  overflow auto
+
+  &__content
+    display flex
+    flex-direction column
+    justify-content space-between
+
+    height 800px
+    background #ddd
+
 </style>
