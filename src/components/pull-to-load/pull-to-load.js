@@ -5,9 +5,19 @@ export default {
       type: Number,
       default: 80,
     },
-    distanceRange: {
+    activeRange: {
+      type: Number,
+      default: 10,
+    },
+    pullSpeedRange: {
       type: Number,
       default: 2,
+    },
+    topFunction: {
+      type: Function,
+    },
+    bottomFunction: {
+      type: Function,
     },
   },
   data() {
@@ -15,6 +25,8 @@ export default {
       startY: 0,
       startScrollTop: 0,
       currentY: 0,
+      topState: '',
+      bottomState: '',
       direction: '',
       translate: 0,
       bottomReached: false,
@@ -45,10 +57,14 @@ export default {
       this.currentY = e.touches[0].clientY
 
       const maxDistance = this.maxDistance
-      const distance = (this.currentY - this.startY) / this.distanceRange
+      const distance = (this.currentY - this.startY) / this.pullSpeedRange
 
       this.direction = distance > 0 ? 'down' : 'up'
-      if (this.direction === 'down' && this.getScrollTop(this.scrollContainer) === 0) {
+      if (
+        typeof this.topFunction === 'function'
+        && this.direction === 'down'
+        && this.getScrollTop(this.scrollContainer) === 0
+      ) {
         event.preventDefault()
         event.stopPropagation()
 
@@ -62,13 +78,19 @@ export default {
         if (this.translate < 0) {
           this.translate = 0
         }
+
+        this.topState = this.translate >= (this.maxDistance - this.activeRange) ? 'active' : 'pull'
       }
 
       if (this.direction === 'up') {
         this.bottomReached = this.bottomReached || this.isScrollToBootom()
       }
 
-      if (this.direction === 'up' && this.bottomReached) {
+      if (
+        typeof this.bottomFunction === 'function'
+        && this.direction === 'up'
+        && this.bottomReached
+      ) {
         event.preventDefault()
         event.stopPropagation()
 
@@ -82,14 +104,40 @@ export default {
         if (this.translate > 0) {
           this.translate = 0
         }
+
+        this.bottomState = this.translate <= -(this.maxDistance - this.activeRange) ? 'active' : 'pull'
       }
     },
     /**
      * touch end event handler
      */
     handleTouchEnd() {
-      if (this.direction === 'up' && this.bottomReached) {
+      if (
+        this.direction === 'down'
+        && this.getScrollTop(this.scrollContainer) === 0
+        && this.translate >= this.maxDistance - this.activeRange
+      ) {
+        if (
+          this.translate >= (this.maxDistance - this.activeRange)
+          && this.topState === 'active'
+        ) {
+          this.topFunction()
+        }
+      }
+
+      if (
+        this.direction === 'up'
+        && this.bottomReached
+        && this.translate < 0
+      ) {
         this.bottomReached = false
+
+        if (
+          this.translate <= -(this.maxDistance - this.activeRange)
+          && this.bottomState === 'active'
+        ) {
+          this.bottomFunction()
+        }
       }
       this.translate = 0
     },
@@ -113,10 +161,12 @@ export default {
      */
     getScrollContainer(element) {
       let currentNode = element
-      while (currentNode
+      while (
+        currentNode
         && currentNode.tagName !== 'html'
         && currentNode.tagName !== 'body'
-        && currentNode.nodeType === 1) {
+        && currentNode.nodeType === 1
+      ) {
         /**
          * Use document.defaultView.getComputedStyle instead of window.getComputedStyle
          * Because of cross-browser and cross-contexts support
@@ -140,9 +190,7 @@ export default {
      */
     getScrollTop(element) {
       if (element === window) {
-        // From jQuery
-        return (window.pageYOffset || document.documentElement.scrollTop)
-          - (document.documentElement.clientTop || 0)
+        return Math.max(window.pageYOffset || 0, document.documentElement.scrollTop)
       }
       return element.scrollTop
     },

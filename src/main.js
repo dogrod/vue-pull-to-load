@@ -6,6 +6,10 @@ import App from './app'
 const vueTouch = require('vue-touch')
 
 Vue.config.productionTip = false
+/* eslint-disable no-console */
+Vue.prototype.$log = console.log.bind(console)
+/* eslint-enable no-console */
+
 Vue.use(vueTouch, { name: 'v-touch' })
 
 /* eslint-disable no-new */

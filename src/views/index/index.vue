@@ -1,6 +1,9 @@
 <template lang="pug">
   .index
-    pull-to-load
+    pull-to-load(
+      :topFunction="topFunction"
+      :bottomFunction="bottomFunction"
+    )
       .index__content
         .index__top
           | I'm top
@@ -15,6 +18,16 @@ import pullToLoad from '@/components/pull-to-load/pull-to-load.vue'
 export default {
   components: {
     pullToLoad,
+  },
+  data() {
+    return {
+      topFunction() {
+        alert('top')
+      },
+      bottomFunction() {
+        alert('bottom')
+      },
+    }
   },
 }
 </script>
