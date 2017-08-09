@@ -1,6 +1,6 @@
 {
   "name": "vue-pull-to-refresh",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "A pull to refresh plugin for Vue.js",
   "author": "dogrod <rodrickjue@hotmail.com>",
   "private": true,
@@ -10,7 +10,9 @@
     "build": "node build/build.js",
     "unit": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js --single-run",
     "test": "npm run unit",
-    "lint": "eslint --ext .js,.vue src test/unit/specs"
+    "lint": "eslint --ext .js,.vue src test/unit/specs",
+    "bump": "mversion patch -m 'chore: Bumped to v%s'",
+    "push": "git pull && npm run bump && git push"
   },
   "dependencies": {
     "vue": "^2.3.3",
@@ -63,6 +65,7 @@
     "karma-webpack": "^2.0.2",
     "lolex": "^1.5.2",
     "mocha": "^3.2.0",
+    "mversion": "^1.10.1",
     "opn": "^5.1.0",
     "optimize-css-assets-webpack-plugin": "^2.0.0",
     "ora": "^1.2.0",
