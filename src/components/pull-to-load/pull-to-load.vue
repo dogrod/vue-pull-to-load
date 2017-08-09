@@ -9,10 +9,10 @@
     :style="containerStyle"
   )
     slot(name="top")
-      .pull-to-load__top pull down to refresh
+      .pull-to-load__top {{ topHint }}
     slot
     slot(name="bottom")
-      .pull-to-load__bottom pull up to load more
+      .pull-to-load__bottom {{ bottomHint }}
 </template>
 
 <script>

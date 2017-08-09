@@ -3,7 +3,7 @@ export default {
   props: {
     maxDistance: {
       type: Number,
-      default: 80,
+      default: 50,
     },
     activeRange: {
       type: Number,
@@ -19,6 +19,38 @@ export default {
     bottomFunction: {
       type: Function,
     },
+    topLoadable: {
+      type: Boolean,
+      default: true,
+    },
+    bottomLoadable: {
+      type: Boolean,
+      default: true,
+    },
+    topPullHint: {
+      type: String,
+      default: 'pull down to load',
+    },
+    bottomPullHint: {
+      type: String,
+      default: 'pull up to load',
+    },
+    topReachHint: {
+      type: String,
+      default: 'release to load',
+    },
+    bottomReachHint: {
+      type: String,
+      default: 'release to load',
+    },
+    topActiveHint: {
+      type: String,
+      default: 'loading...',
+    },
+    bottomActiveHint: {
+      type: String,
+      default: 'loading...',
+    },
   },
   data() {
     return {
@@ -31,9 +63,63 @@ export default {
       translate: 0,
       bottomReached: false,
       scrollContainer: null,
+      topHint: this.topPullHint,
+      bottomHint: this.bottomPullHint,
     }
   },
+  watch: {
+    /**
+     * top area state description
+     * @param {String} value - state
+     */
+    topState(value) {
+      switch (value) {
+        case 'pull': {
+          this.topHint = this.topPullHint
+          break
+        }
+        case 'reach': {
+          this.topHint = this.topReachHint
+          break
+        }
+        case 'active': {
+          this.topHint = this.topActiveHint
+          break
+        }
+        default: {
+          return
+        }
+      }
+    },
+    /**
+     * bottom area state description
+     * @param {String} value - state
+     */
+    bottomState(value) {
+      switch (value) {
+        case 'pull': {
+          this.bottomHint = this.bottomPullHint
+          break
+        }
+        case 'reach': {
+          this.bottomHint = this.bottomReachHint
+          break
+        }
+        case 'active': {
+          this.bottomHint = this.bottomActiveHint
+          break
+        }
+        default: {
+          return
+        }
+      }
+    },
+  },
   computed: {
+    /**
+     * computed container style object
+     * @return {Object} container stylesheet
+     */
     containerStyle() {
       return {
         transform: `translate3d(0, ${this.translate}px, 0)`,
@@ -64,9 +150,10 @@ export default {
         typeof this.topFunction === 'function'
         && this.direction === 'down'
         && this.getScrollTop(this.scrollContainer) === 0
+        && this.topLoadable
       ) {
-        event.preventDefault()
-        event.stopPropagation()
+        e.preventDefault()
+        e.stopPropagation()
 
         this.translate =
           Math.abs(distance) <= maxDistance
@@ -79,7 +166,7 @@ export default {
           this.translate = 0
         }
 
-        this.topState = this.translate >= (this.maxDistance - this.activeRange) ? 'active' : 'pull'
+        this.topState = this.translate >= (this.maxDistance - this.activeRange) ? 'reach' : 'pull'
       }
 
       if (this.direction === 'up') {
@@ -90,9 +177,10 @@ export default {
         typeof this.bottomFunction === 'function'
         && this.direction === 'up'
         && this.bottomReached
+        && this.bottomLoadable
       ) {
-        event.preventDefault()
-        event.stopPropagation()
+        e.preventDefault()
+        e.stopPropagation()
 
         this.translate =
           Math.abs(distance) <= maxDistance
@@ -105,7 +193,7 @@ export default {
           this.translate = 0
         }
 
-        this.bottomState = this.translate <= -(this.maxDistance - this.activeRange) ? 'active' : 'pull'
+        this.bottomState = this.translate <= -(this.maxDistance - this.activeRange) ? 'reach' : 'pull'
       }
     },
     /**
@@ -115,13 +203,19 @@ export default {
       if (
         this.direction === 'down'
         && this.getScrollTop(this.scrollContainer) === 0
-        && this.translate >= this.maxDistance - this.activeRange
+        && this.translate > 0
       ) {
         if (
-          this.translate >= (this.maxDistance - this.activeRange)
-          && this.topState === 'active'
+          this.translate >= this.maxDistance - this.activeRange
+          && this.topState === 'reach'
         ) {
-          this.topFunction()
+          this.topFunction.call(this.$parent)
+          this.topState = 'active'
+
+          this.translate = 50
+        } else {
+          this.topState = 'pull'
+          this.translate = 0
         }
       }
 
@@ -134,12 +228,17 @@ export default {
 
         if (
           this.translate <= -(this.maxDistance - this.activeRange)
-          && this.bottomState === 'active'
+          && this.bottomState === 'reach'
         ) {
-          this.bottomFunction()
+          this.bottomFunction.call(this.$parent)
+          this.bottomState = 'active'
+
+          this.translate = -50
+        } else {
+          this.bottomState = 'pull'
+          this.translate = 0
         }
       }
-      this.translate = 0
     },
     /**
      * check if scroll to bottom
@@ -152,7 +251,7 @@ export default {
       }
 
       return this.$el.getBoundingClientRect().bottom
-        <= this.scrollContainer.getBoundingClientRect().bottom
+        <= this.scrollContainer.getBoundingClientRect().bottom + 2 // add 2 pixel for optimize UE
     },
     /**
      * locate this element's scroll container
@@ -193,6 +292,20 @@ export default {
         return Math.max(window.pageYOffset || 0, document.documentElement.scrollTop)
       }
       return element.scrollTop
+    },
+    /**
+     * clear loading state of top area
+     */
+    handleTopLoaded() {
+      this.topState = 'pull'
+      this.translate = 0
+    },
+    /**
+     * clear loading state of top area
+     */
+    handleBottomLoaded() {
+      this.bottomState = 'pull'
+      this.translate = 0
     },
   },
   mounted() {
