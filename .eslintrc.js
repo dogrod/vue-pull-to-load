@@ -106,6 +106,7 @@ module.exports = {
     'no-underscore-dangle': [0],
     'new-cap': [1],
     'no-restricted-syntax': [0],
+    'no-useless-return': [0],
     'class-methods-use-this': [0],
     'import/no-unresolved': [0],
     'import/prefer-default-export': [0],

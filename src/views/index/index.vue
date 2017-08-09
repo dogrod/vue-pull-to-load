@@ -1,6 +1,7 @@
 <template lang="pug">
   .index
     pull-to-load(
+      ref="ptl"
       :topFunction="topFunction"
       :bottomFunction="bottomFunction"
     )
@@ -23,9 +24,19 @@ export default {
     return {
       topFunction() {
         alert('top')
+        setTimeout(
+          () => {
+            this.$refs.ptl.handleTopLoaded()
+          }, 500
+        )
       },
       bottomFunction() {
         alert('bottom')
+        setTimeout(
+          () => {
+            this.$refs.ptl.handleBottomLoaded()
+          }, 500
+        )
       },
     }
   },
