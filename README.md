@@ -2,6 +2,16 @@
 
 > A pull to refresh plugin for Vue.js
 
+## Feature
+
+* pull down / pull up to load more or other action
+
+## TO-DO
+
+- [ ] optional animation
+- [ ] performance optimization
+- [ ] e.t.c.
+
 ## Build Setup
 
 ``` bash
