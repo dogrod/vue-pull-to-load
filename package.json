@@ -1,6 +1,6 @@
 {
   "name": "vue-pull-to-refresh",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A pull to refresh plugin for Vue.js",
   "author": "dogrod <rodrickjue@hotmail.com>",
   "private": true,
