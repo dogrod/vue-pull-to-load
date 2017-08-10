@@ -3,7 +3,7 @@ export default {
   props: {
     maxDistance: {
       type: Number,
-      default: 50,
+      default: 60,
     },
     activeRange: {
       type: Number,
@@ -51,6 +51,11 @@ export default {
       type: String,
       default: 'loading...',
     },
+    // only work when bottomFunction && bottomLoadable === false
+    bottomLoadEndHint: {
+      type: String,
+      default: 'nothing here',
+    },
   },
   data() {
     return {
@@ -65,6 +70,7 @@ export default {
       scrollContainer: null,
       topHint: this.topPullHint,
       bottomHint: this.bottomPullHint,
+      bottomLoadEnd: false,
     }
   },
   watch: {
@@ -114,6 +120,19 @@ export default {
         }
       }
     },
+    /**
+     * watch bottomLoadable to fire bottom load end effect
+     * @param {boolean} value - current value
+     */
+    bottomLoadable(value) {
+      if (
+        !value
+        && typeof this.bottomFunction === 'function'
+      ) {
+        this.bottomLoadEnd = true
+        this.bottomHint = this.bottomLoadEndHint
+      }
+    },
   },
   computed: {
     /**
@@ -124,6 +143,16 @@ export default {
       return {
         transform: `translate3d(0, ${this.translate}px, 0)`,
       }
+    },
+    /**
+     * bottom area class
+     * @return {Array} return class array
+     */
+    bottomClass() {
+      return [
+        'pull-to-load__bottom',
+        { 'pull-to-load__bottom--end': this.bottomLoadEnd },
+      ]
     },
   },
   methods: {

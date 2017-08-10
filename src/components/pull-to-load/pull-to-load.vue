@@ -1,8 +1,8 @@
 <template lang="pug">
 .pull-to-load(
-  @touchstart="handleTouchStart"
+  @touchstart.passive="handleTouchStart"
   @touchmove="handleTouchMove"
-  @touchend="handleTouchEnd"
+  @touchend.passive="handleTouchEnd"
 )
   .pull-to-load__wrapper(
     ref="ptlWrapper"
@@ -12,7 +12,7 @@
       .pull-to-load__top {{ topHint }}
     slot
     slot(name="bottom")
-      .pull-to-load__bottom {{ bottomHint }}
+      div(:class="bottomClass") {{ bottomHint }}
 </template>
 
 <script>

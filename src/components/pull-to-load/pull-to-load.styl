@@ -1,6 +1,3 @@
-*
-  box-sizing: border-box
-
 .pull-to-load
   overflow hidden
 
@@ -19,3 +16,22 @@
 
   &__bottom
     margin-bottom -50px
+
+    &--end
+      margin-bottom: 20px
+      font-size: 22px
+      color: #999
+
+      &:before,
+      &:after
+        content: ''
+        display: block
+        width: 40px
+        height: 2px
+        background: #999
+
+      &:before
+        margin-right: 10px
+
+      &:after
+        margin-left: 10px
