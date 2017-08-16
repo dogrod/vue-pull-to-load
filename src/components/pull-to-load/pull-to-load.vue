@@ -9,10 +9,19 @@
     :style="containerStyle"
   )
     slot(name="top")
-      .pull-to-load__top {{ topHint }}
+      .pull-to-load__top
+        .pull-to-load__top__bg(
+          :style="topBackgroundStyle"
+        )
+          .pull-to-load__circle(
+            :style="topAreaCircleStyle"
+          )
+        .pull-to-load__top__content {{ topHint }}
     slot
-    slot(name="bottom")
-      div(:class="bottomClass") {{ bottomHint }}
+  slot(name="bottom")
+    div(
+      :class="bottomClass",
+    ) {{ bottomHint }}
 </template>
 
 <script>

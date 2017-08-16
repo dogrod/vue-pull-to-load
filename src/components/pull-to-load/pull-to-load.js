@@ -3,11 +3,11 @@ export default {
   props: {
     maxDistance: {
       type: Number,
-      default: 60,
+      default: 80,
     },
     activeRange: {
       type: Number,
-      default: 10,
+      default: 5,
     },
     pullSpeedRange: {
       type: Number,
@@ -102,6 +102,8 @@ export default {
      * @param {String} value - state
      */
     bottomState(value) {
+      if (!this.bottomLoadable) return
+
       switch (value) {
         case 'pull': {
           this.bottomHint = this.bottomPullHint
@@ -131,6 +133,9 @@ export default {
       ) {
         this.bottomLoadEnd = true
         this.bottomHint = this.bottomLoadEndHint
+      } else {
+        this.bottomLoadEnd = false
+        this.bottomHint = this.bottomPullHint
       }
     },
   },
@@ -142,6 +147,32 @@ export default {
     containerStyle() {
       return {
         transform: `translate3d(0, ${this.translate}px, 0)`,
+      }
+    },
+    /**
+     * top area backgroud block style
+     * @return {Object} stylesheet
+     */
+    topBackgroundStyle() {
+      if (this.direction !== 'down') return false
+
+      const scaleY = this.translate / this.maxDistance
+
+      return {
+        transform: `scaleX(1.05) scaleY(${scaleY})`,
+      }
+    },
+    /**
+     * top area backgroud's content block style
+     * @return {Object} stylesheet
+     */
+    topAreaCircleStyle() {
+      if (this.direction !== 'down') return false
+
+      return {
+        transform: (this.topState === 'reach' || this.topState === 'active')
+          ? `translateY(${this.maxDistance + 20}px)`
+          : '',
       }
     },
     /**
@@ -241,7 +272,7 @@ export default {
           this.topFunction.call(this.$parent)
           this.topState = 'active'
 
-          this.translate = 50
+          this.translate = this.maxDistance
         } else {
           this.topState = 'pull'
           this.translate = 0
@@ -262,7 +293,7 @@ export default {
           this.bottomFunction.call(this.$parent)
           this.bottomState = 'active'
 
-          this.translate = -50
+          this.translate = -(this.maxDistance)
         } else {
           this.bottomState = 'pull'
           this.translate = 0
@@ -326,15 +357,24 @@ export default {
      * clear loading state of top area
      */
     handleTopLoaded() {
-      this.topState = 'pull'
       this.translate = 0
+      // set time-out for disapear transition
+      setTimeout(
+        () => {
+          this.topState = 'pull'
+        }, 200
+      )
     },
     /**
      * clear loading state of top area
      */
     handleBottomLoaded() {
-      this.bottomState = 'pull'
       this.translate = 0
+      setTimeout(
+        () => {
+          this.bottomState = 'pull'
+        }, 200
+      )
     },
   },
   mounted() {
